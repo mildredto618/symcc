@@ -20,7 +20,7 @@ and 18) and Z3 (version 4.5 or later), as well as a C++ compiler with support
 for C++17. LLVM lit is only needed to run the tests; if it's not packaged with
 your LLVM, you can get it with `pip install lit`.
 
-Under Ubuntu Groovy the following one liner should install all required
+Under Ubuntu Groovy the following one-liner should install all required
 packages:
 
 ```
@@ -31,11 +31,10 @@ Alternatively, see below for using the provided Dockerfile, or the file
 `util/quicktest.sh` for exact steps to perform under Ubuntu (or use with the
 provided Vagrant file).
 
-Make sure to pull the QSYM code:
+Make sure to pull the SymCC Runtime:
 
 ```
-$ git submodule init
-$ git submodule update
+$ git submodule update --init --recursive
 ```
 
 Note that it is not necessary or recommended to build the QSYM submodule - our
@@ -46,7 +45,7 @@ Create a build directory somewhere, and execute the following commands inside
 it:
 
 ```
-$ cmake -G Ninja -DQSYM_BACKEND=ON /path/to/compiler/sources
+$ cmake -G Ninja -DSYMCC_RT_BACKEND=qsym /path/to/compiler/sources
 $ ninja check
 ```
 
@@ -141,19 +140,27 @@ contains detailed instructions to replicate our experiments, as well as the raw
 results that we obtained.
 
 ### Video demonstration
-On YouTube you can find [a practical introduction to SymCC](https://www.youtube.com/watch?v=htDrNBiL7Y8) as well as a video on [how to combine AFL and SymCC](https://www.youtube.com/watch?v=zmC-ptp3W3k)
+On YouTube you can find [a practical introduction to
+SymCC](https://www.youtube.com/watch?v=htDrNBiL7Y8) as well as a video on [how
+to combine AFL and SymCC](https://www.youtube.com/watch?v=zmC-ptp3W3k)
 
 ## Building a Docker image
 
 If you prefer a Docker container over building SymCC natively, just tell Docker
 to build the image after pulling the QSYM code as above. (Be warned though: the
-Docker image enables optional C++ support from source, so creating
-the image can take quite some time!)
+Docker image enables optional C++ support from source, so creating the image can
+take quite some time!)
 
 ```
-$ git submodule init
-$ git submodule update
 $ docker build -t symcc .
+$ docker run -it --rm symcc
+```
+
+Alternatively, you can pull an existing image (current master branch) from
+Docker Hub:
+
+```
+$ docker pull eurecoms3/symcc
 $ docker run -it --rm symcc
 ```
 
@@ -186,8 +193,8 @@ many cases it is sufficient to let the build system figure out what to rebuild
 
 ### Why is SymCC only exploring one path and not all paths?
 
-SymCC is currently a concolic executor it follows the concrete
-path. In theory, it would be possible to make it a forking executor
+SymCC is currently a concolic executor. As such, it follows the concrete
+path. In theory, it would be possible to make it a forking executor -
 see [issue #14](https://github.com/eurecom-s3/symcc/issues/14)
 
 ### Why does SymCC not generate some test cases?
@@ -213,7 +220,7 @@ unsupported libc function is called SymCC can't trace the computations
 that happen in the function.
 
 1. Adding the function to the [collection of wrapped libc
-   functions](https://github.com/eurecom-s3/symcc/blob/master/runtime/LibcWrappers.cpp)
+   functions](https://github.com/eurecom-s3/symcc-rt/blob/main/src/LibcWrappers.cpp)
    and [register the
    wrapper](https://github.com/eurecom-s3/symcc/blob/b29dc4db2803830ebf50798e72b336473a567655/compiler/Runtime.cpp#L159)
    in the compiler.
@@ -281,11 +288,6 @@ SymCC is free software: you can redistribute it and/or modify it under the terms
 of the GNU General Public License as published by the Free Software Foundation,
 either version 3 of the License, or (at your option) any later version.
 
-As an exception from the above, you can redistribute and/or modify the SymCC
-runtime under the terms of the GNU Lesser General Public License as published by
-the Free Software Foundation, either version 3 of the License, or (at your
-option) any later version. See #114 for the rationale.
-
 SymCC is distributed in the hope that it will be useful, but WITHOUT ANY
 WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
 PARTICULAR PURPOSE. See the GNU General Public License for more details.
@@ -299,6 +301,4 @@ licenses, and/or restrictions:
 
 | Program       | Directory                   |
 |---------------|-----------------------------|
-| QSYM          | `runtime/qsym_backend/qsym` |
-| SymCC runtime | `runtime`                   |
-
+| SymCC Runtime | `runtime`                   |
